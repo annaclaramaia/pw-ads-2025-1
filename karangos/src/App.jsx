@@ -10,8 +10,12 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
 import theme from './ui/theme'
 
-import FooterBar from "./ui/FooterBar"
 import TopBar from './ui/TopBar'
+import FooterBar from './ui/FooterBar'
+
+import { BrowserRouter } from 'react-router-dom'
+import AppRoutes from './routes/AppRoutes'
+import Box from '@mui/material/Box'
 
 function App() {
 
@@ -19,9 +23,19 @@ function App() {
     <>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <TopBar />
+        
+        <BrowserRouter>
+          <TopBar />
+
+          {/* Dentro da prop "sx", "m" significa "margin" */}
+          <Box id="innerRoot" sx={{ m: '48px 24px' }}>
+            <AppRoutes />
+          </Box>
+
+          <FooterBar />
+        </BrowserRouter>
+
       </ThemeProvider>
-      <FooterBar/>
     </>
   )
 }
