@@ -15,7 +15,14 @@ export default function BoxBasic() {
             bottom: 0,          //na parte de baixo da página
             width: '100vw'      //100% da largura da viewport
         }}>
-        <Typography variant="caption" gutterBottom>
+        <Typography 
+          variant="caption" 
+          gutterBottom
+          sx={{
+            '& a': {  //Altera a cor do link (a) dentro do Typography
+              color: 'secondary.light'
+            }
+          }}>
             Desenvolvido e mantido com < LocalCafeIcon fontSize='small'/> por <a
             href="mailto:anna.fernandes@fatec.sp.gov.br">Anna Clara Maia Fernandes</a>
         </Typography>
