@@ -4,17 +4,17 @@ import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
-import InputMask from 'react-input-mask'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { ptBR } from 'date-fns/locale/pt-BR'
 import { parseISO } from 'date-fns'
 import { feedbackWait, feedbackNotify, feedbackConfirm } from '../../ui/Feedback'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useMask } from '@react-input/mask'
 
 export default function CustomersForm() {
 
-  const states = [
+  const brazilianStates = [
     { value: 'DF', label: 'Distrito Federal' },
     { value: 'ES', label: 'Espírito Santo' },
     { value: 'GO', label: 'Goiás' },
@@ -25,10 +25,22 @@ export default function CustomersForm() {
     { value: 'SP', label: 'São Paulo' }
   ]
 
-  const phoneMaskFormatChars = {
-    '9': '[0-9]',     // Somente dígitos
-    '%': '[\s0-9]'    // Dígitos ou espaço em branco (\s)
-  }
+  const identDocumentRef = useMask({
+    mask: "###.###.###-##",
+    replacement: { 
+      '#': /[0-9]/,   // Somente dígitos
+    },
+    showMask: false
+  })
+
+  const phoneRef = useMask({
+    mask: "(##) %####-####",
+    replacement: { 
+      '#': /[0-9]/,   // Somente dígitos
+      '%': /[0-9\s]/  // Dígitos ou espaço em branco (\s)
+    },
+    showMask: false
+  })
 
   // Por padrão, todos os campos começam com uma string vazia como valor.
   // A exceção é o campo birth_date, do tipo data, que, por causa do
@@ -74,7 +86,7 @@ export default function CustomersForm() {
       const response = await fetch(
         import.meta.env.VITE_API_BASE + `/customers/${params.id}`
       )
-      const result = response.json()
+      const result = await response.json()
 
       // Converte o formato de data armazenado no banco de dados
       // para o formato reconhecido pelo componente DatePicker
@@ -181,21 +193,16 @@ export default function CustomersForm() {
           onChange={handleFieldChange}
         />
 
-        <InputMask
-          mask="999.999.999-99"
+        <TextField
+          inputRef={identDocumentRef}
+          variant="outlined"
+          name="ident_document"
+          label="CPF"
+          fullWidth
+          required
           value={customer.ident_document}
           onChange={handleFieldChange}
-        >
-          { () =>
-            <TextField 
-              variant="outlined"
-              name="ident_document"
-              label="CPF"
-              fullWidth
-              required
-            />
-          }
-        </InputMask>
+        />
 
         {/* 
           O evento onChange do componente DatePicker não passa o parâmetro
@@ -272,41 +279,35 @@ export default function CustomersForm() {
           onChange={handleFieldChange}
         />
 
-        <TextField 
-          variant="outlined"
+        <TextField
+          variant="outlined" 
           name="state"
-          label="UF"
+          label="UF" 
           fullWidth
           required
           value={customer.state}
-          onChange={handleFieldChange}
           select
+          onChange={handleFieldChange}
         >
-          { states.map(state => {
-              <MenuItem key={state.value} value={state.value}>
-                {state.label}
+          {
+            brazilianStates.map(s => 
+              <MenuItem key={s.value} value={s.value}>
+                {s.label}
               </MenuItem>
-            })
+            )
           }
         </TextField>
 
-        <InputMask
-          mask="(99) %9999-9999"
-          formatChars={phoneMaskFormatChars}
-          maskChar=" "
+        <TextField
+          inputRef={phoneRef}
+          variant="outlined"
+          name="phone"
+          label="Telefone/celular"
+          fullWidth
+          required
           value={customer.phone}
           onChange={handleFieldChange}
-        >
-          { () =>
-              <TextField
-                variant="outlined"
-                name="phone"
-                label="Telefone/celular"
-                fullWidth
-                required
-              />
-          }
-        </InputMask>
+        />
 
         <TextField 
           variant="outlined"
